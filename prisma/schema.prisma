@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  name        String
+  status      Int? 
+  idGoogle    String   @unique
+  password    String? 
+  age         Int?     // Thêm trường cho tuổi
+  gender      String?  // Thêm trường cho giới tính
+  dateOfBirth DateTime? // Thêm trường cho ngày sinh
+  address     String?  // Thêm trường cho địa chỉ
+  phoneNumber String?  // Thêm trường cho số điện thoại
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  eventUsers EventUser[]
+}
+
+model Admin {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  password    String? 
+  name        String? 
+  role        String?
+  age         Int? 
+  status      Int?
+  gender      String? 
+  dateOfBirth DateTime? 
+  address     String? 
+  phoneNumber String? 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Event {
+  id          Int         @id @default(autoincrement())
+  title       String      // Tên sự kiện
+  description String?     // Mô tả sự kiện
+  status      Int?
+  location    String      // Địa điểm
+  date        DateTime    // Ngày giờ diễn ra sự kiện
+  seats       Int         // Số lượng chỗ ngồi
+  //user        User        @relation("UserEvents", fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  eventUsers EventUser[]
+}
+          
+model EventUser {
+  idEvent Int
+  idUser  Int
+  event   Event @relation(fields: [idEvent], references: [id])
+  user    User  @relation(fields: [idUser], references: [id])
+
+  @@id([idEvent, idUser]) 
+}
+
