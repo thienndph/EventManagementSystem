@@ -6,6 +6,7 @@ import { EventUserService } from 'src/event_user/event_user.service';
 
 @Module({
   providers: [EventService,PrismaService,EventUserService],
-  controllers: [EventController]
+  controllers: [EventController],
+  exports:[EventService]
 })
 export class EventModule {}

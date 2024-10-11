@@ -1,13 +1,11 @@
-import { IsString, IsOptional, IsEmail, IsInt, IsDate, IsPhoneNumber } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsEmail, IsString, IsOptional, IsInt } from 'class-validator';
 
 export class CreateAdminDto {
   @IsEmail()
   email: string;
 
-  @IsOptional()
   @IsString()
-  password?: string;
+  password: string;
 
   @IsOptional()
   @IsString()
@@ -15,19 +13,21 @@ export class CreateAdminDto {
 
   @IsOptional()
   @IsString()
-  role?: string;
+  role?: 'admin' | 'superAdmin'; 
 
   @IsOptional()
   @IsInt()
   age?: number;
 
   @IsOptional()
+  @IsInt()
+  status?: number;
+
+  @IsOptional()
   @IsString()
   gender?: string;
 
   @IsOptional()
-  @IsDate()
-  @Type(() => Date) // Chuyển đổi chuỗi thành Date
   dateOfBirth?: Date;
 
   @IsOptional()
@@ -35,6 +35,6 @@ export class CreateAdminDto {
   address?: string;
 
   @IsOptional()
-  @IsPhoneNumber(null)
+  @IsString()
   phoneNumber?: string;
 }

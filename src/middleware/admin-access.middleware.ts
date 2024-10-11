@@ -6,6 +6,6 @@ export class AdminAccessMiddleware implements NestMiddleware {
     if (req.userType !== 'admin') {
       throw new HttpException('Forbidden: Admin access only', HttpStatus.FORBIDDEN);
     }
-    next();  // Cho phép tiếp tục nếu là admin
+    next();  
   }
 }
