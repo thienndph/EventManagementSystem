@@ -16,7 +16,7 @@ export class AdminController {
 
   @Post()
   @ApiResponse({ status: 201, description: 'Admin created successfully.' })
- // @ApiBearerAuth()
+  @ApiBearerAuth()
   regester(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.create(createAdminDto);
   }

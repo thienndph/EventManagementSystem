@@ -8,7 +8,8 @@ import { EventModule } from 'src/event/event.module';
 import { EventUserService } from 'src/event_user/event_user.service';
 
 @Module({
-  imports:[EventModule],
+  imports:[
+    EventModule],
   controllers: [UserController],
   providers: [UserService,PrismaService,JwtService,EventService,EventUserService]
 })
