@@ -49,37 +49,77 @@ export class AuthService {
 
     // Tìm người dùng theo email
     const user = await this.prisma.user.findUnique({
-      where: { email },
+        where: { email },
     });
 
     // Kiểm tra người dùng có tồn tại và mật khẩu đã được lưu
     if (!user || !user.password) {
-      throw new UnauthorizedException('Invalid email or password');
+        throw new UnauthorizedException('Invalid email or password');
     }
 
     // Kiểm tra mật khẩu có khớp không
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new UnauthorizedException('Invalid email or password');
+        throw new UnauthorizedException('Invalid email or password');
     }
 
     // Tạo token JWT với thông tin người dùng
     const token = this.jwtService.sign({
-      id: user.id,
-      email: user.email,
-      name: user.name,
+        id: user.id, // ID người dùng
+        email: user.email,
+        name: user.name,
     });
 
     // Trả về token và thông tin người dùng
     return {
+        message: 'Login successful',
+        user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+        },
+        token, // Trả về token JWT cho client
+    };
+ }
+
+
+ async loginAdmin(loginDto: LoginDto) {
+  const { email, password } = loginDto;
+
+  // Tìm người dùng theo email
+  const admin = await this.prisma.admin.findUnique({
+      where: { email },
+  });
+
+  // Kiểm tra người dùng có tồn tại và mật khẩu đã được lưu
+  if (!admin || !admin.password) {
+      throw new UnauthorizedException('Invalid email or password');
+  }
+
+  // Kiểm tra mật khẩu có khớp không
+  const passwordMatch = await bcrypt.compare(password, admin.password);
+  if (!passwordMatch) {
+      throw new UnauthorizedException('Invalid email or password');
+  }
+
+  // Tạo token JWT với thông tin người dùng
+  const token = this.jwtService.sign({
+      id: admin.id, // ID người dùng
+      email: admin.email,
+      name: admin.name,
+      role :admin.role,
+  });
+
+  // Trả về token và thông tin người dùng
+  return {
       message: 'Login successful',
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+          id: admin.id,
+          email: admin.email,
+          name: admin.name,
       },
-      token: token, // Trả về token JWT cho client
-    };
-  }
+      token, // Trả về token JWT cho client
+  };
+}
   
 }

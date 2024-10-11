@@ -1,15 +1,20 @@
 // src/users/user.controller.ts
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { LoginDto } from './dtos/login-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { CreateEventDto } from 'src/event/dtos/create-event.dto';
+import { EventService } from 'src/event/event.service';
 
 @ApiTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService,
+              private readonly eventService: EventService
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'register a new user' })
@@ -51,5 +56,17 @@ export class UserController {
   @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.userService.deleteUser(+id);
+  }
+
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('create_event')
+  @ApiOperation({ summary: 'Create an event' })
+  @ApiResponse({ status: 201, description: 'The event has been successfully created.' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  async createEvent(@Body() requestBody: CreateEventDto, @Req() @Req() req: any) {
+    const userId = req.user.id;
+    console.log(userId);
+   return this.eventService.createEvent(requestBody,userId);
   }
 }
