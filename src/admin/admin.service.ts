@@ -25,19 +25,18 @@ export class AdminService {
     return this.prisma.admin.findMany();
   }
   async findOne(id: number) {
-    // Kiểm tra nếu id không được cung cấp
     if (id === undefined || id === null) {
-      throw new Error("ID must be provided"); // Ném lỗi nếu id không hợp lệ
+      throw new Error("ID must be provided");
     }
   
-    // Gọi hàm findUnique để tìm admin
+
     const admin = await this.prisma.admin.findUnique({
       where: {
-        id: id, // Đảm bảo bạn đang sử dụng giá trị id hợp lệ
+        id: id, 
       },
     });
-  
-    // Kiểm tra nếu không tìm thấy admin
+
+    
     if (!admin) {
       throw new Error("Admin not found"); // Thông báo nếu không tìm thấy admin
     }
