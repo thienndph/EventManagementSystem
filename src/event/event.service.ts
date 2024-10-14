@@ -41,9 +41,9 @@ export class EventService {
   }
   
   async getEventByStatus(): Promise<Event[]> {
-    const status = 0; // hoặc giá trị status bạn muốn tìm
+    const status = 0; 
     return this.prisma.event.findMany({
-      where: { status }, // Tìm kiếm theo status
+      where: { status }, 
     });
   }
   

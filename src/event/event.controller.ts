@@ -7,13 +7,13 @@ import { UpdateEventDto } from './dtos/update-event.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('events') 
-@Controller('events')
+@Controller()
 @ApiBearerAuth()
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Post()
+  @Post('/create_event')
   @ApiOperation({ summary: 'Create an event' })
   @ApiResponse({ status: 201, description: 'The event has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -24,14 +24,14 @@ export class EventController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('/event_no_accept')
+  @Get('admin/event_no_accept')
   @ApiResponse({ status: 200, description: 'List event no accept.' })
   findByStatus() {
     return this.eventService.getEventByStatus();
   }
  
   @UseGuards(AuthGuard('jwt'))
-  @Get()
+  @Get('admin/getAll')
   @ApiOperation({ summary: 'Get all events' })
   @ApiResponse({ status: 200, description: 'List of events' })
   async getAllEvents(): Promise<Event[]> {
@@ -39,7 +39,7 @@ export class EventController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
+  @Get('admin/getbyid/:id')
   @ApiOperation({ summary: 'Get event by ID' })
   @ApiResponse({ status: 200, description: 'The found event' })
   @ApiResponse({ status: 404, description: 'Event not found' })
@@ -48,7 +48,7 @@ export class EventController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':id')
+  @Patch('admin/update/:id')
   @ApiOperation({ summary: 'Update an event' })
   @ApiResponse({ status: 200, description: 'The updated event' })
   @ApiResponse({ status: 404, description: 'Event not found' })
@@ -57,7 +57,7 @@ export class EventController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete(':id')
+  @Delete('admin/update/:id')
   @ApiOperation({ summary: 'Delete an event' })
   @ApiResponse({ status: 200, description: 'The event has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Event not found' })
