@@ -1,15 +1,35 @@
 // src/users/user.controller.ts
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { LoginDto } from './dtos/login-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { CreateEventDto } from 'src/event/dtos/create-event.dto';
+import { EventUser } from '@prisma/client';
+import { EventService } from 'src/event/event.service';
+import { UserAccessMiddleware } from 'src/middleware/user-access.middleware';
 
-@ApiTags('users')
-@Controller('users')
+@ApiTags('user')
+@Controller('user')
+@UseInterceptors(UserAccessMiddleware) 
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService,
+    private readonly eventService: EventService
+  ) {}
+
+
+  @Post('createEvent')
+  @ApiOperation({ summary: 'Create an event' })
+  @ApiResponse({ status: 201, description: 'The event has been successfully created.' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiBearerAuth()
+  async createEvent(@Body() requestBody: CreateEventDto, @Req() @Req() req: any) {
+        const userId = req.user.id;
+        console.log(userId);
+       return this.eventService.createEvent(requestBody,userId);
+      }
 
   @Post()
   @ApiOperation({ summary: 'register a new user' })
@@ -18,7 +38,10 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
-  @Get()
+
+  @UseGuards(AuthGuard('jwt')) // Sử dụng guard xác thực JWT
+  //@UseInterceptors(UserAccessMiddleware) 
+  @Get('getalluser')
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of users' })
   @ApiBearerAuth()
@@ -52,4 +75,6 @@ export class UserController {
   remove(@Param('id') id: string) {
     return this.userService.deleteUser(+id);
   }
+  
+
 }

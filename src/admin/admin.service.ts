@@ -3,6 +3,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { CreateAdminDto } from './dtos/create-admin.dto';
 import { UpdateAdminDto } from './dtos/update-admin.dto';
 import * as bcrypt from 'bcrypt';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AdminService {
@@ -17,6 +18,7 @@ export class AdminService {
       data: {
         ...createAdminDto,
         password: hashedPassword, 
+        role: createAdminDto.role || Role.ADMIN, 
       },
     });
   }
@@ -39,7 +41,9 @@ export class AdminService {
     await this.findOne(id); // Kiểm tra admin có tồn tại không
     return this.prisma.admin.update({
       where: { id },
-      data: updateAdminDto,
+      data: {
+        ...updateAdminDto,
+        role: updateAdminDto.role,}
     });
   }
 

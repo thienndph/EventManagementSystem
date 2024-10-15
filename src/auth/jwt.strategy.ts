@@ -1,5 +1,3 @@
-// src/auth/jwt.strategy.ts
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -11,20 +9,19 @@ import { User } from '@prisma/client';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly prisma: PrismaService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Lấy token từ header
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), 
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET, // Lấy secret từ biến môi trường
+      secretOrKey: process.env.ADMIN_SECRET_KEY, 
     });
   }
 
   async validate(payload: JwtPayload): Promise<User> {
-    // Tìm người dùng trong DB bằng ID từ payload
-    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    const user = await this.prisma.user.findUnique({ where: { email: payload.email } });
 
     if (!user) {
-      throw new UnauthorizedException(); // Nếu không tồn tại, ném ngoại lệ
+      throw new UnauthorizedException(); 
     }
 
-    return user; // Trả về người dùng đã xác thực
+    return user; 
   }
 }

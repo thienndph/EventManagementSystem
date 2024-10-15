@@ -14,7 +14,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
-// Phương thức validate() sẽ được gọi khi OAuth thành công
+
 async validate(
   accessToken: string,
   refreshToken: string,

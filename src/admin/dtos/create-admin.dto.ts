@@ -1,5 +1,6 @@
 import { IsString, IsOptional, IsEmail, IsInt, IsDate, IsPhoneNumber } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Role } from '@prisma/client';
 
 export class CreateAdminDto {
   @IsEmail()
@@ -15,7 +16,7 @@ export class CreateAdminDto {
 
   @IsOptional()
   @IsString()
-  role?: string;
+  role?: Role;
 
   @IsOptional()
   @IsInt()
@@ -27,7 +28,7 @@ export class CreateAdminDto {
 
   @IsOptional()
   @IsDate()
-  @Type(() => Date) // Chuyển đổi chuỗi thành Date
+  @Type(() => Date)
   dateOfBirth?: Date;
 
   @IsOptional()

@@ -15,27 +15,32 @@ export class RoleMiddleware implements NestMiddleware {
     const token = authHeader.split(' ')[1];
     try {
       const decoded = this.jwtService.verify(token);
+      req.user = decoded; 
 
-      // Kiểm tra bảng tương ứng dựa trên decoded.type
-      if (decoded.type === 'admin') {
-        const admin = await this.prisma.admin.findUnique({ where: { id: decoded.id } });
-        if (!admin) {
+      let user;
+      if (decoded.type === 'Admin') {
+        user = await this.prisma.admin.findUnique({ where: { id: decoded.id } });
+        if (!user) {
           throw new HttpException('Admin not found', HttpStatus.FORBIDDEN);
         }
-        req.userType = 'admin';  // Gán admin vào request
-      } else if (decoded.type === 'user') {
-        const user = await this.prisma.user.findUnique({ where: { id: decoded.id } });
+        req.userType = 'Admin'; 
+      } else if (decoded.type === 'User') {
+        user = await this.prisma.user.findUnique({ where: { id: decoded.id } });
         if (!user) {
           throw new HttpException('User not found', HttpStatus.FORBIDDEN);
         }
-        req.userType = 'user';  // Gán user vào request
+        req.userType = 'User'; 
       } else {
         throw new HttpException('Invalid user type', HttpStatus.FORBIDDEN);
       }
 
-      next();  // Cho phép tiếp tục nếu token hợp lệ và người dùng tồn tại
+      req.userInfo = user; 
+      next(); 
     } catch (error) {
-      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+      if (error instanceof HttpException) {
+        throw error; 
+      }
+      throw new HttpException('Invalid token RoleMiddleware', HttpStatus.UNAUTHORIZED);
     }
   }
 }
