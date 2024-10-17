@@ -1,6 +1,6 @@
 // src/event/event.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Event } from '@prisma/client';
 import { CreateEventDto } from './dtos/create-event.dto';
@@ -40,12 +40,19 @@ export class EventService {
     });
   }
   
-  async getEventByStatus(): Promise<Event[]> {
-    const status = 0; // hoặc giá trị status bạn muốn tìm
-    return this.prisma.event.findMany({
-      where: { status }, // Tìm kiếm theo status
+  async getEventByStatus(status:number): Promise<Event[]> {
+    
+    const events = await this.prisma.event.findMany({
+      where: { status },
     });
+  
+    if (!events.length) {
+      throw new NotFoundException(`No events found with status ${status}`);
+    }
+  
+    return events;
   }
+  
   
 
   async updateEvent(id: number, data: UpdateEventDto): Promise<Event> {

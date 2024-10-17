@@ -6,13 +6,13 @@ import { CreateEventDto } from './dtos/create-event.dto';
 import { UpdateEventDto } from './dtos/update-event.dto';
 import { AuthGuard } from '@nestjs/passport';
 
-// @ApiTags('events') 
+ //@ApiTags('events') 
  @Controller('events')
 @ApiBearerAuth()
 export class EventController {
-//   constructor(private readonly eventService: EventService) {}
+  constructor(private readonly eventService: EventService) {}
 
-//   @UseGuards(AuthGuard('jwt'))
+//  // @UseGuards(AuthGuard('jwt'))
 //   @Post()
 //   @ApiOperation({ summary: 'Create an event' })
 //   @ApiResponse({ status: 201, description: 'The event has been successfully created.' })
@@ -23,14 +23,14 @@ export class EventController {
 //    return this.eventService.createEvent(requestBody,userId);
 //   }
 
-//   @UseGuards(AuthGuard('jwt'))
+// //   @UseGuards(AuthGuard('jwt'))
 //   @Get('/event_no_accept')
 //   @ApiResponse({ status: 200, description: 'List event no accept.' })
 //   findByStatus() {
-//     return this.eventService.getEventByStatus();
+//     return this.eventService.getEventByStatus(0);
 //   }
  
-//   @UseGuards(AuthGuard('jwt'))
+//  // @UseGuards(AuthGuard('jwt'))
 //   @Get()
 //   @ApiOperation({ summary: 'Get all events' })
 //   @ApiResponse({ status: 200, description: 'List of events' })
@@ -38,7 +38,7 @@ export class EventController {
 //     return this.eventService.getAllEvents();
 //   }
 
-//   @UseGuards(AuthGuard('jwt'))
+//   //@UseGuards(AuthGuard('jwt'))
 //   @Get(':id')
 //   @ApiOperation({ summary: 'Get event by ID' })
 //   @ApiResponse({ status: 200, description: 'The found event' })
@@ -47,7 +47,7 @@ export class EventController {
 //     return this.eventService.getEventById(+id);
 //   }
 
-//   @UseGuards(AuthGuard('jwt'))
+//  // @UseGuards(AuthGuard('jwt'))
 //   @Patch(':id')
 //   @ApiOperation({ summary: 'Update an event' })
 //   @ApiResponse({ status: 200, description: 'The updated event' })
@@ -56,7 +56,7 @@ export class EventController {
 //     return this.eventService.updateEvent(+id, requestBody);
 //   }
 
-//   @UseGuards(AuthGuard('jwt'))
+//   //@UseGuards(AuthGuard('jwt'))
 //   @Delete(':id')
 //   @ApiOperation({ summary: 'Delete an event' })
 //   @ApiResponse({ status: 200, description: 'The event has been successfully deleted.' })
@@ -64,4 +64,4 @@ export class EventController {
 //   async deleteEvent(@Param('id') id: string): Promise<Event> {
 //     return this.eventService.deleteEvent(+id);
 //   }
- }
+  }

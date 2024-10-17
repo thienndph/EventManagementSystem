@@ -19,7 +19,6 @@ export class AuthService {
     const existingUser = await this.prisma.user.findUnique({ where: { email: user.email } });
 
     if (!existingUser) {
-      // Nếu người dùng chưa tồn tại, tạo mới
       const newUser = await this.prisma.user.create({
         data: {
           email: user.email, 
@@ -30,6 +29,7 @@ export class AuthService {
           address: null,     
           phoneNumber: null,
           idGoogle:user.idGoogle, 
+          status:user.status
                
         },
       });
@@ -39,11 +39,16 @@ export class AuthService {
     return existingUser;
   }
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id ,typeAuth:user.typeAuth };
+    const payload = { email: user.email, sub: user.id ,typeAuth:user.typeAuth ,status:user.status};
   
-    // Sửa cú pháp khai báo token
+    const status0 =0
     const type ='User'
     const token = this.jwtService.sign(payload);
+    payload.status=0;
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: 'refresh_token_secret',
+      expiresIn: '7d',
+    });
     return {
       message: 'Login successful',
       user: {
@@ -51,8 +56,10 @@ export class AuthService {
         email: user.email,
         name: user.name,
         typeAuth:type,
+        status :payload.status
       },
-      token: token, // Trả về token JWT cho client
+      token: token,
+      refreshToken:refreshToken, 
     };
   }
   
@@ -84,6 +91,14 @@ export class AuthService {
       typeAuth:type,
     });
   
+    const refreshToken = this.jwtService.sign({
+       id: user.id,
+      email: user.email,
+      name: user.name,
+      typeAuth:type,}, {
+      secret: 'refresh_token_secret',
+      expiresIn: '7d',  // Refresh token hết hạn sau 7 ngày
+    });
 
     // Trả về token và thông tin người dùng
     return {
@@ -94,7 +109,8 @@ export class AuthService {
         name: user.name,
         typeAuth:type,
       },
-      token: token, // Trả về token JWT cho client
+      token: token,
+      refreshToken:refreshToken,
     };
   }
 
@@ -112,6 +128,10 @@ export class AuthService {
       typeAuth:type};
     const token = this.jwtService.sign(payload);
 
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: 'refresh_token_secret',
+      expiresIn: '7d',  // Refresh token hết hạn sau 7 ngày
+    });
     return {
       message: 'Login successful',
       user: {
@@ -121,7 +141,15 @@ export class AuthService {
         typeAuth:type,
       },
       token: token, 
+      refreshToken:refreshToken,
 
     };
+  }
+
+  createAccessToken(payload: any) {
+    return this.jwtService.sign(payload, {
+      secret: 'access_token_secret',
+      expiresIn: '15m',
+    });
   }
 }

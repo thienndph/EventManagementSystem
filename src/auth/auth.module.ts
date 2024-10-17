@@ -2,10 +2,11 @@ import { Module,MiddlewareConsumer } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PrismaService } from 'prisma/prisma.service';
-import { PassportModule } from '@nestjs/passport'; // Nếu bạn đang sử dụng Passport
-import { JwtModule } from '@nestjs/jwt'; // Import JwtModule
-import { GoogleStrategy } from './google.strategy'; // Đảm bảo đường dẫn đúng
+import { PassportModule } from '@nestjs/passport'; 
+import { JwtModule } from '@nestjs/jwt';
+import { GoogleStrategy } from './google.strategy'; 
 import { JwtStrategy } from './jwt.strategy';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, PrismaService,JwtStrategy],
+  providers: [AuthService, GoogleStrategy, PrismaService,JwtStrategy,UserService],
   exports: [AuthService,], 
 })
 export class AuthModule { 

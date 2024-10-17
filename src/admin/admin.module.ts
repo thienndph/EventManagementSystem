@@ -5,6 +5,9 @@ import { PrismaService } from 'prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { EventService } from 'src/event/event.service';
 import { EventUserService } from 'src/event_user/event_user.service';
+import { APP_GUARD } from '@nestjs/core';
+import { AdminGuards } from './guards/admin.guard';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
@@ -15,12 +18,17 @@ import { EventUserService } from 'src/event_user/event_user.service';
     }),
   ],
   controllers: [AdminController],
-  providers: [AdminService,PrismaService,EventService,EventUserService],
-  exports: [AdminService],
+  providers: [AdminService,PrismaService,EventService,EventUserService,AdminGuards,UserService
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AdminGuards, // Đảm bảo rằng AdminGuard là một class guard hợp lệ
+    // },
+  ],
+  exports: [AdminService,AdminGuards],
 })
 export class AdminModule {
   //   configure(consumer: MiddlewareConsumer) {
-  //  consumer.apply(AuthMiddleware).forRoutes('admin'); 
+  //  consumer.apply(AdminController).forRoutes('admin'); 
   //  }
  }
  
