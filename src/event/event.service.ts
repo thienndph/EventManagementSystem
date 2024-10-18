@@ -35,6 +35,7 @@ export class EventService {
   }
 
   async getEventById(id: number): Promise<Event> {
+    //const parsedId = Number(id);
     return this.prisma.event.findUnique({
       where: { id },
     });

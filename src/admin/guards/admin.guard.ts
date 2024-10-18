@@ -4,8 +4,6 @@ import { Reflector } from '@nestjs/core'
 export class AdminGuards implements CanActivate {
   constructor(private reflector: Reflector) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('TEST:'); // Log admin object
-
     const adminRole = this.reflector.get<string[]>('roles', context.getHandler());
   
     if (!adminRole) {
@@ -30,7 +28,6 @@ export class AdminGuards implements CanActivate {
       return false;
     }
   
-    // Sử dụng toString() chỉ khi chắc chắn rằng roles đã được xác định
     return adminRole.includes(admin.role.toString());
   }
 }  

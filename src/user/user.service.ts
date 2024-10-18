@@ -10,32 +10,36 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService,
-              private jwtService:JwtService
-  ) {}
+    private jwtService: JwtService
+  ) { }
 
-async createUser(createUserDto: CreateUserDto) {
-  const { email, name, age, gender, dateOfBirth, address, phoneNumber, idGoogle, password } = createUserDto;
-  
-  const hashedPassword = await bcrypt.hash(password, 10);
-  
-  const user = await this.prisma.user.create({
-    data: {
-      email,
-      name,
-      age,
-      gender,
-      dateOfBirth,
-      address,
-      phoneNumber,
-      idGoogle,
-      password: hashedPassword, 
-    },
-  });
+  async createUser(createUserDto: CreateUserDto) {
+    const { email, name, age, gender, dateOfBirth, address, phoneNumber, idGoogle, password } = createUserDto;
 
-  return user;
-}
+    const hashedPassword = await bcrypt.hash(password, 10);
 
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        name,
+        age,
+        gender,
+        dateOfBirth,
+        address,
+        phoneNumber,
+        idGoogle,
+        password: hashedPassword,
+      },
+    });
 
+    return user;
+  }
+
+  async getProfile(id: number) {
+    
+
+    return ;
+  }
 
   async findAll() {
     return this.prisma.user.findMany();
@@ -43,8 +47,13 @@ async createUser(createUserDto: CreateUserDto) {
 
 
   async findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.prisma.user.findUnique({
+      where: {
+        id: id,  
+      },
+    });
   }
+  
 
 
   async updateUser(id: number, updateUserDto: UpdateUserDto) {
@@ -60,5 +69,5 @@ async createUser(createUserDto: CreateUserDto) {
       where: { id },
     });
   }
-  
+
 }
