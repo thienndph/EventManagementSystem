@@ -1,6 +1,6 @@
 // src/event/event.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Event } from '@prisma/client';
 import { CreateEventDto } from './dtos/create-event.dto';
@@ -35,17 +35,25 @@ export class EventService {
   }
 
   async getEventById(id: number): Promise<Event> {
+    //const parsedId = Number(id);
     return this.prisma.event.findUnique({
       where: { id },
     });
   }
   
-  async getEventByStatus(): Promise<Event[]> {
-    const status = 0; 
-    return this.prisma.event.findMany({
-      where: { status }, 
+  async getEventByStatus(status:number): Promise<Event[]> {
+    
+    const events = await this.prisma.event.findMany({
+      where: { status },
     });
+  
+    if (!events.length) {
+      throw new NotFoundException(`No events found with status ${status}`);
+    }
+  
+    return events;
   }
+  
   
 
   async updateEvent(id: number, data: UpdateEventDto): Promise<Event> {
