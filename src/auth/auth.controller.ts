@@ -47,7 +47,7 @@ export class AuthController {
   register(@Body() createUserDto: CreateUserDto) {
     return this.userService.createUser(createUserDto);
   }
-
+https://github.com/thienndph/EventManagementSystem/pull/6/conflict?name=src%252Fauth%252Fauth.controller.ts&ancestor_oid=6a2d2d8458266a5a40df2428e76a3ce766164521&base_oid=fe8d695d79165616204882c20d6890a4c381a079&head_oid=1d21110cfbf9f629486670d42fe835e58fa9c90e
 //   @Post('refresh')
 // async refreshToken(@Body('refreshToken') refreshToken: string) {
 //   if (!refreshToken) {

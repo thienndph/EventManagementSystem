@@ -8,6 +8,7 @@ import { UserModule } from 'src/user/user.module';
 @Module({
   imports:[UserModule],
   providers: [EventService,PrismaService,EventUserService],
-  controllers: [EventController]
+  controllers: [EventController],
+  exports:[EventService]
 })
 export class EventModule {}
