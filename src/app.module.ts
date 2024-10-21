@@ -2,17 +2,14 @@ import { Module,MiddlewareConsumer,RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { EventModule } from './event/event.module';
-import { AdminModule } from './admin/admin.module';
-import { EventUserModule } from './event_user/event_user.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { EventModule } from './modules/event/event.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { EventUserModule } from './modules/event_user/event_user.module';
 import { AdminAccessMiddleware } from './middleware/admin-access.middleware';
 import { UserAccessMiddleware } from './middleware/user-access.middleware';
-import { PrismaService } from 'prisma/prisma.service';
-import { UserModule } from './user/user.module';
-//import { RoleMiddleware } from './middleware/role.middleware';
-import { APP_GUARD } from '@nestjs/core';
-import { AdminGuards } from './admin/guards/admin.guard';
+import { PrismaService } from './modules/prisma/prisma.service';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [

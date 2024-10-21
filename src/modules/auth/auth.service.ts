@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { PrismaService } from 'prisma/prisma.service';
-import { LoginDto } from 'src/user/dtos/login-user.dto';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { LoginDto } from 'src/modules/user/dtos/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginAdminDto } from './dtos/login-admin.dto';
 
@@ -45,10 +45,10 @@ export class AuthService {
     const type ='User'
     const token = this.jwtService.sign(payload);
     payload.status=0;
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: 'refresh_token_secret',
-      expiresIn: '7d',
-    });
+    // const refreshToken = this.jwtService.sign(payload, {
+    //   secret: 'refresh_token_secret',
+    //   expiresIn: '7d',
+    // });
     return {
       message: 'Login successful',
       user: {
@@ -59,31 +59,24 @@ export class AuthService {
         status :payload.status
       },
       token: token,
-      refreshToken:refreshToken, 
+    //  refreshToken:refreshToken, 
     };
   }
   
 
   async loginUser(loginDto: LoginDto) {
     const { email, password } = loginDto;
-
-    // Tìm người dùng theo email
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
-
-    // Kiểm tra người dùng có tồn tại và mật khẩu đã được lưu
     if (!user || !user.password) {
       throw new UnauthorizedException('Invalid email or password');
     }
-
-    // Kiểm tra mật khẩu có khớp không
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid email or password');
     }
     const type ='User'
-    // Tạo token JWT với thông tin người dùng
     const token = this.jwtService.sign({
       id: user.id,
       email: user.email,
@@ -91,16 +84,14 @@ export class AuthService {
       typeAuth:type,
     });
   
-    const refreshToken = this.jwtService.sign({
-       id: user.id,
-      email: user.email,
-      name: user.name,
-      typeAuth:type,}, {
-      secret: 'refresh_token_secret',
-      expiresIn: '7d',  // Refresh token hết hạn sau 7 ngày
-    });
-
-    // Trả về token và thông tin người dùng
+    // const refreshToken = this.jwtService.sign({
+    //    id: user.id,
+    //   email: user.email,
+    //   name: user.name,
+    //   typeAuth:type,}, {
+    //   secret: 'refresh_token_secret',
+    //   expiresIn: '7d', 
+    // });
     return {
       message: 'Login successful',
       user: {
@@ -110,7 +101,7 @@ export class AuthService {
         typeAuth:type,
       },
       token: token,
-      refreshToken:refreshToken,
+      // refreshToken:refreshToken,
     };
   }
 
@@ -128,10 +119,10 @@ export class AuthService {
       typeAuth:type};
     const token = this.jwtService.sign(payload);
 
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: 'refresh_token_secret',
-      expiresIn: '7d',  // Refresh token hết hạn sau 7 ngày
-    });
+    // const refreshToken = this.jwtService.sign(payload, {
+    //   secret: 'refresh_token_secret',
+    //   expiresIn: '7d',  
+    // });
     return {
       message: 'Login successful',
       user: {
@@ -141,7 +132,7 @@ export class AuthService {
         typeAuth:type,
       },
       token: token, 
-      refreshToken:refreshToken,
+    //  refreshToken:refreshToken,
 
     };
   }

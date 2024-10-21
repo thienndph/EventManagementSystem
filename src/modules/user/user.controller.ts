@@ -1,13 +1,10 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dtos/create-user.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
-import { LoginDto } from './dtos/login-user.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { CreateEventDto } from 'src/event/dtos/create-event.dto';
+
+import { CreateEventDto } from 'src/modules/event/dtos/create-event.dto';
 import { EventUser } from '@prisma/client';
-import { EventService } from 'src/event/event.service';
+import { EventService } from 'src/modules/event/event.service';
 import { UserAccessMiddleware } from 'src/middleware/user-access.middleware';
 
 @ApiTags('user')

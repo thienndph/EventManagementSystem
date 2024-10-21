@@ -1,8 +1,7 @@
 import { Injectable, NestMiddleware, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
 import { verify } from 'jsonwebtoken';
 import { get } from 'lodash';
-import { AdminService } from 'src/admin/admin.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/modules/user/user.service';
 @Injectable()
 export class UserAccessMiddleware implements NestMiddleware {
   constructor(private readonly userService: UserService) {}

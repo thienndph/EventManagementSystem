@@ -1,7 +1,7 @@
 import { Module,MiddlewareConsumer } from '@nestjs/common';
 import { AuthAdminController } from './auth.admin.controller';
 import { AuthAdminService } from './admin.service';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { PassportModule } from '@nestjs/passport'; // Nếu bạn đang sử dụng Passport
 import { JwtModule } from '@nestjs/jwt'; // Import JwtModule
 

@@ -1,11 +1,11 @@
 import { BadRequestException, Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service'; // Đảm bảo đường dẫn đúng
 import { AuthGuard } from '@nestjs/passport';
-import { LoginDto } from 'src/user/dtos/login-user.dto';
+
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from 'src/user/dtos/create-user.dto';
-import { UserService } from 'src/user/user.service';
+import { CreateUserDto } from 'src/modules/user/dtos/create-user.dto';
+import { UserService } from 'src/modules/user/user.service';
 import { LoginAdminDto } from './dtos/login-admin.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
 

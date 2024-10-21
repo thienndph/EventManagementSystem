@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { EventService } from 'src/event/event.service';
-import { EventUserService } from 'src/event_user/event_user.service';
+import { EventService } from 'src/modules/event/event.service';
+import { EventUserService } from 'src/modules/event_user/event_user.service';
 import { UserAccessMiddleware } from 'src/middleware/user-access.middleware';
 
 @Module({

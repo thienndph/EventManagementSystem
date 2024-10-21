@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
-import { AdminGuards } from './admin/guards/admin.guard';
+import { AdminGuards } from './modules/admin/guards/admin.guard';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {

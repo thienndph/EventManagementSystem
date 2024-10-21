@@ -1,11 +1,11 @@
 // src/event/event.service.ts
 
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { Event } from '@prisma/client';
 import { CreateEventDto } from './dtos/create-event.dto';
 import { UpdateEventDto } from './dtos/update-event.dto';
-import { EventUserService } from 'src/event_user/event_user.service';
+import { EventUserService } from 'src/modules/event_user/event_user.service';
 
 @Injectable()
 export class EventService {

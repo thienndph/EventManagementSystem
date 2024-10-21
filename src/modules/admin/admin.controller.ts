@@ -4,17 +4,12 @@ import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dtos/create-admin.dto';
 import { UpdateAdminDto } from './dtos/update-admin.dto';
 import { AdminGuard } from 'src/decorator/role.decorator';
-
-import { AuthGuard } from '@nestjs/passport';
-import { EventUserService } from 'src/event_user/event_user.service';
-import { EventService } from 'src/event/event.service';
+import { EventService } from '../event/event.service';
 import { Event } from '@prisma/client';
-import { UpdateEventDto } from 'src/event/dtos/update-event.dto';
+import { UpdateEventDto } from '../event/dtos/update-event.dto';
 import { AdminGuards } from './guards/admin.guard';
-import { AdminAccessMiddleware } from 'src/middleware/admin-access.middleware';
-import { CreateEventDto } from 'src/event/dtos/create-event.dto';
-import { UpdateUserDto } from 'src/user/dtos/update-user.dto';
-import { UserService } from 'src/user/user.service';
+import { UpdateUserDto } from '../user/dtos/update-user.dto';
+import { UserService } from '../user/user.service';
 
 @ApiTags('admin')
 @ApiBearerAuth()

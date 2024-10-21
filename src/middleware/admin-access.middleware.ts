@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { verify } from 'jsonwebtoken';
 import { get } from 'lodash';
-import { AdminService } from 'src/admin/admin.service';
+import { AdminService } from 'src/modules/admin/admin.service';
 
 @Injectable()
 export class AdminAccessMiddleware implements NestMiddleware {
