@@ -1,38 +1,68 @@
+
 # EventManagementSystem
+
 ## Installation
-```bash
-# DATABASE
-- PostgreSQL vesion 16.4-1
-- Create database EventManagementSystem
-```
 
-```bash
-# Edit your .env file
-- Use env.develop to create .evn run project
-```
+### Database Setup
+1. **Database**: PostgreSQL version 16.4-1
+2. **Create Database**: 
+   - Create a database called `EventManagementSystem` in your PostgreSQL server.
+  
+### Environment Setup
+1. **.env File**:
+   - Use the `env.develop` file as a template to create a `.env` file.
+   - Make sure to configure the necessary environment variables like database credentials in the `.env` file to run the project.
 
-```bash
-# Run Prisma client
-$ npx prisma migrate dev --schema=./src/modules/prisma/postgres/schema.prisma
-$ npx prisma generate --schema=./src/modules/prisma/postgres/schema.prisma
-```
+### Prisma Setup
+1. **Run Prisma Migrations and Generate Client**:
+   ```bash
+   $ npx prisma migrate dev --schema=./src/modules/prisma/postgres/schema.prisma
+   $ npx prisma generate --schema=./src/modules/prisma/postgres/schema.prisma
+   ```
 
-```bash
-# Run the api server app
-$ npm install
-$ npm run start:dev
-```
+### API Server Setup
+1. **Install Dependencies**:
+   ```bash
+   $ npm install
+   ```
+2. **Run Development Server**:
+   ```bash
+   $ npm run start:dev
+   ```
 
-Our API should be ready at http://localhost:3000/api
+3. **API URL**:
+   - The API will be available at: `http://localhost:3000/api`
 
-## Running the app
+---
 
-```bash
-# development
-$ npm run start:dev
-## Development
-### Adding new field to DB, alter table, and generate new schema and migration script
-- Alter `schema.prisma`
-- `npm run migrate-dev` Generate migration script (SQL) based on schema vs actual DB
-- `npm run generate-prisma`: sync schema to ORM models (NodeJS)
-- `npm run migrate-deploy`: sync migration file into real DB
+## Running the App
+
+### Development Mode
+1. **Start Development Server**:
+   ```bash
+   $ npm run start:dev
+   ```
+
+### Database Schema Changes
+If you need to add a new field to the database, modify tables, or update the schema, follow these steps:
+
+1. **Edit Schema**:
+   - Alter the `schema.prisma` file to reflect the new changes.
+
+2. **Generate Migration Script**:
+   - Generate the migration script based on the updated schema and the actual database.
+   ```bash
+   $ npm run migrate-dev
+   ```
+
+3. **Sync Prisma Models**:
+   - Synchronize the schema with the Prisma ORM models.
+   ```bash
+   $ npm run generate-prisma
+   ```
+
+4. **Apply Migrations to Database**:
+   - Apply the migration files to update the actual database.
+   ```bash
+   $ npm run migrate-deploy
+   ```
