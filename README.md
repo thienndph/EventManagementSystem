@@ -16,8 +16,8 @@
 ### Prisma Setup
 1. **Run Prisma Migrations and Generate Client**:
    ```bash
-   $ npx prisma migrate dev --schema=./src/modules/prisma/postgres/schema.prisma
-   $ npx prisma generate --schema=./src/modules/prisma/postgres/schema.prisma
+   $ npx prisma migrate deploy --schema=./src/modules/prisma/schema.prisma
+   $ npx prisma generate --schema=./src/modules/prisma/schema.prisma
    ```
 
 ### API Server Setup
@@ -58,11 +58,10 @@ If you need to add a new field to the database, modify tables, or update the sch
 3. **Sync Prisma Models**:
    - Synchronize the schema with the Prisma ORM models.
    ```bash
-   $ npm run generate
+   $ npx prisma generate --schema=./src/modules/prisma/schema.prisma
    ```
 
 4. **Apply Migrations to Database**:
    - Apply the migration files to update the actual database.
    ```bash
-   $ npm run migrate-deploy
-   ```
+   $ npx prisma migrate deploy --schema=./src/modules/prisma/schema.prisma
