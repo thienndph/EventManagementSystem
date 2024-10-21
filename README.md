@@ -58,7 +58,7 @@ If you need to add a new field to the database, modify tables, or update the sch
 3. **Sync Prisma Models**:
    - Synchronize the schema with the Prisma ORM models.
    ```bash
-   $ npm run generate-prisma
+   $ npm run generate
    ```
 
 4. **Apply Migrations to Database**:
