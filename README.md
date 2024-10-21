@@ -1,4 +1,4 @@
-#EventManagementSystem
+# EventManagementSystem
 ## Installation
 ```bash
 # DATABASE
