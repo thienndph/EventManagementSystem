@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, BadRequestException, Req, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, BadRequestException, Req, NotFoundException, Query } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dtos/create-admin.dto';
@@ -40,7 +40,8 @@ export class AdminController {
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
   @Get('getAll')
   @ApiResponse({ status: 200, description: 'List of all admins.' })
-  findAll() {
+  async findAll(
+  ) {
     return this.adminService.findAll();
   }
 
@@ -122,7 +123,7 @@ export class AdminController {
   @Get('eventAll')
   @ApiOperation({ summary: 'Get all events' })
   @ApiResponse({ status: 200, description: 'List of events' })
-  async getAllEvents(): Promise<Event[]> {
+  async getAllEvents() {
     return this.eventService.getAllEvents();
   }
 

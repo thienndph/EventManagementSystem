@@ -1,5 +1,5 @@
 // src/users/user.service.ts
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -42,7 +42,26 @@ export class UserService {
   }
 
   async findAll() {
-    return this.prisma.user.findMany();
+    try {
+      const page=1;
+      const limit=10;
+      const skip = (page - 1) * limit;
+      const users = await this.prisma.user.findMany({
+        skip: skip,
+        take: limit,
+      });
+
+      const total = await this.prisma.admin.count();
+
+      return {
+        data: users,
+        total,
+        page,
+        limit,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching admins');
+    }
   }
 
 

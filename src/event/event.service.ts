@@ -30,8 +30,27 @@ export class EventService {
     return event;
   }
 
-  async getAllEvents(): Promise<Event[]> {
-    return this.prisma.event.findMany();
+  async getAllEvents(){
+    try {
+      const page=1;
+      const limit=10;
+      const skip = (page - 1) * limit;
+      const events = await this.prisma.event.findMany({
+        skip: skip,
+        take: limit,
+      });
+
+      const total = await this.prisma.event.count();
+
+      return {
+        data: events,
+        total,
+        page,
+        limit,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching event');
+    }
   }
 
   async getEventById(id: number): Promise<Event> {
@@ -41,17 +60,29 @@ export class EventService {
     });
   }
   
-  async getEventByStatus(status:number): Promise<Event[]> {
+  async getEventByStatus(status:number) {
     
-    const events = await this.prisma.event.findMany({
-      where: { status },
-    });
-  
-    if (!events.length) {
-      throw new NotFoundException(`No events found with status ${status}`);
+    try {
+      const page=1;
+      const limit=10;
+      const skip = (page - 1) * limit;
+      const events = await this.prisma.event.findMany({
+        skip: skip,
+        take: limit,
+        where: { status: status },
+      });
+
+      const total = await this.prisma.event.count();
+
+      return {
+        data: events,
+        total,
+        page,
+        limit,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching event');
     }
-  
-    return events;
   }
 
   async updateStatus(id: string): Promise<Event> {

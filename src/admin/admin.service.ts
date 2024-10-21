@@ -27,7 +27,22 @@ export class AdminService {
 
   async findAll() {
     try {
-      return this.prisma.admin.findMany();
+      const page=1;
+      const limit=10;
+      const skip = (page - 1) * limit;
+      const admins = await this.prisma.admin.findMany({
+        skip: skip,
+        take: limit,
+      });
+
+      const total = await this.prisma.admin.count();
+
+      return {
+        data: admins,
+        total,
+        page,
+        limit,
+      };
     } catch (error) {
       throw new InternalServerErrorException('Error fetching admins');
     }
@@ -55,7 +70,7 @@ export class AdminService {
   
   async update(id: number, updateAdminDto: UpdateAdminDto) {
     try {
-      await this.findOne(id); // Kiểm tra admin có tồn tại không
+      await this.findOne(id); 
       return this.prisma.admin.update({
         where: { id },
         data: {
@@ -70,7 +85,7 @@ export class AdminService {
 
   async remove(id: number) {
     try {
-      await this.findOne(id); // Kiểm tra admin có tồn tại không
+      await this.findOne(id); 
       return this.prisma.admin.delete({
         where: { id },
       });
