@@ -48,7 +48,6 @@ export class AuthController {
     return this.userService.createUser(createUserDto);
   }
 
-//   @Post('refresh')
 // async refreshToken(@Body('refreshToken') refreshToken: string) {
 //   if (!refreshToken) {
 //     throw new BadRequestException('Refresh token is required');

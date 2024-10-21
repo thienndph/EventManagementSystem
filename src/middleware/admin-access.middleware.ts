@@ -17,12 +17,11 @@ export class AdminAccessMiddleware implements NestMiddleware {
       const decoded = verify(jwtToken, process.env.ADMIN_SECRET_KEY);
       const { sub, typeAuth } = decoded as any;
       console.log('sub==>'+sub)
-      const admin = await this.adminService.findOne(+sub); // Tìm admin dựa trên ID
+      const admin = await this.adminService.findOne(+sub); 
       if (!admin) throw new UnauthorizedException('Admin not found');
       
-      // Gán thông tin admin vào request
       req.admin = admin;
-      req['admin'] = admin; // Đảm bảo admin được gán đúng
+      req['admin'] = admin;
       next();
     } catch (error) {
       throw new UnauthorizedException('Invalid token');

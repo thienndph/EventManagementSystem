@@ -1,71 +1,53 @@
-<<<<<<< HEAD
 import { IsString, IsOptional, IsEmail, IsInt, IsDate, IsPhoneNumber, IsEnum, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Role } from '@prisma/client';
-=======
-import { IsEmail, IsString, IsOptional, IsInt } from 'class-validator';
->>>>>>> 123ae7ec7c9bf2d484fa529e2d50072e8093d99d
+import { ApiProperty } from '@nestjs/swagger';
+
 
 export class CreateAdminDto {
+  @ApiProperty()
   @IsEmail({}, { message: 'Email is not valid' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
 
-<<<<<<< HEAD
+  @ApiProperty()
   @IsOptional()
   @IsString({ message: 'Password must be a string' })
   password?: string;
-=======
-  @IsString()
-  password: string;
->>>>>>> 123ae7ec7c9bf2d484fa529e2d50072e8093d99d
 
+  @ApiProperty()
   @IsOptional()
   @IsString({ message: 'Name must be a string' })
   name?: string;
 
+  @ApiProperty()
   @IsOptional()
-<<<<<<< HEAD
   @IsEnum(Role, { message: 'Role must be ADMIN or SUPER_ADMIN' })
   role?: Role; 
-=======
-  @IsString()
-  role?: 'admin' | 'superAdmin'; 
->>>>>>> 123ae7ec7c9bf2d484fa529e2d50072e8093d99d
 
+  @ApiProperty()
   @IsOptional()
   @IsInt({ message: 'Age must be an integer' })
   age?: number;
 
+  @ApiProperty()
   @IsOptional()
-<<<<<<< HEAD
   @IsString({ message: 'Gender must be a string' })
   gender?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsDate({ message: 'Date of Birth must be a valid date' })
   @Type(() => Date)
-=======
-  @IsInt()
-  status?: number;
-
-  @IsOptional()
-  @IsString()
-  gender?: string;
-
-  @IsOptional()
->>>>>>> 123ae7ec7c9bf2d484fa529e2d50072e8093d99d
   dateOfBirth?: Date;
 
+  @ApiProperty()
   @IsOptional()
   @IsString({ message: 'Address must be a string' })
   address?: string;
 
+  @ApiProperty()
   @IsOptional()
-<<<<<<< HEAD
   @IsPhoneNumber(null, { message: 'Phone Number is not valid' })
-=======
-  @IsString()
->>>>>>> 123ae7ec7c9bf2d484fa529e2d50072e8093d99d
   phoneNumber?: string;
 }

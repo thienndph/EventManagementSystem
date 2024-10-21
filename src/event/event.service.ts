@@ -1,6 +1,6 @@
 // src/event/event.service.ts
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Event } from '@prisma/client';
 import { CreateEventDto } from './dtos/create-event.dto';
@@ -53,6 +53,18 @@ export class EventService {
   
     return events;
   }
+
+  async updateStatus(id: string): Promise<Event> {
+    const newStatus=1;
+    const idNew = parseInt(id, 10);
+    return this.prisma.event.update({
+      where: { id:idNew },
+      data: {
+        status: newStatus,  
+      },
+    });
+  }
+  
   
   
 
@@ -68,4 +80,26 @@ export class EventService {
       where: { id },
     });
   }
+  
+  async findOne(id: number) {
+    if (id === undefined || id === null) {
+      throw new BadRequestException('ID is required');
+    }
+  try {
+       const event = await this.prisma.event.findUnique({
+        where: { id },
+      });
+       console.log("event=>"+event)
+      if (event==null) {
+        throw new NotFoundException(`Event with ID ${id} not found`);
+      }
+      return event;
+  } catch (error) {
+    throw error;
+  }
+   
+  }
+  
+  
 }
+``

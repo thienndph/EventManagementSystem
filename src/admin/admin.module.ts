@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module,MiddlewareConsumer } from '@nestjs/common';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { PrismaService } from 'prisma/prisma.service';
@@ -8,6 +8,7 @@ import { EventUserService } from 'src/event_user/event_user.service';
 import { APP_GUARD } from '@nestjs/core';
 import { AdminGuards } from './guards/admin.guard';
 import { UserService } from 'src/user/user.service';
+
 @Module({
   imports: [
     JwtModule.register({

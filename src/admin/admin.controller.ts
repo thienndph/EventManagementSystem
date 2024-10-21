@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, BadRequestException, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, BadRequestException, Req, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dtos/create-admin.dto';
@@ -32,7 +32,7 @@ export class AdminController {
   @Post()
   @ApiResponse({ status: 201, description: 'Admin created successfully.' })
   regester(@Body() createAdminDto: CreateAdminDto) {
-    createAdminDto.role =("ADMIN")
+    createAdminDto.role = ("ADMIN")
     return this.adminService.create(createAdminDto);
   }
 
@@ -45,11 +45,11 @@ export class AdminController {
   }
 
 
-  @AdminGuard(['SUPER_ADMIN','ADMIN'])
+  @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
   @Get('getByID/:id')
   @ApiResponse({ status: 200, description: 'Admin found.' })
   @ApiResponse({ status: 404, description: 'Admin not found.' })
-  async getAdminById(@Param('id') id: string) {  
+  async getAdminById(@Param('id') id: string) {
     if (!this.isNumber(id)) {
       throw new BadRequestException('Vui lòng nhập số');
     }
@@ -57,8 +57,8 @@ export class AdminController {
   }
 
   isNumber(value: any): boolean {
-    const num = Number(value); 
-    return !isNaN(num) && typeof num === 'number';  
+    const num = Number(value);
+    return !isNaN(num) && typeof num === 'number';
   }
 
   @AdminGuard(['SUPER_ADMIN'])
@@ -77,10 +77,14 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'Admin deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Admin not found.' })
   remove(@Param('id') id: string) {
+    const parsedId = Number(id);
+    // const user = await this.u.findUnique({
+    //   where: { id },
+    // });
     if (!this.isNumber(id)) {
       throw new BadRequestException('Vui lòng nhập số');
     }
-    return this.adminService.remove(+id);
+    return this.adminService.remove(+parsedId);
   }
 
 
@@ -95,6 +99,24 @@ export class AdminController {
     return this.eventService.getEventByStatus(status);
   }
 
+  @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
+  @Post('eventConfirm/:id')
+  @ApiResponse({ status: 200, description: 'List event no accept.' })
+  confirmEvent(@Param('id') id: string): Promise<Event> {
+    console.log("Id=>"+id)
+    const parsedId = Number(id);
+    console.log("parsedId=>"+parsedId)
+    if (!this.isNumber(parsedId)) {
+      throw new BadRequestException('Vui lòng nhập số');
+    }
+    const event_confirm= this.eventService.getEventById(parsedId);
+    if(!event_confirm){
+      throw new BadRequestException('Vui lòng nhập lại đúng');
+      }
+
+    return this.eventService.updateStatus(id);
+  }
+
 
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
   @Get('eventAll')
@@ -104,18 +126,21 @@ export class AdminController {
     return this.eventService.getAllEvents();
   }
 
-
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
   @Get('getIdEvent/:id')
   @ApiOperation({ summary: 'Get event by ID' })
   @ApiResponse({ status: 200, description: 'The found event' })
   @ApiResponse({ status: 404, description: 'Event not found' })
   async getEventById(@Param('id') id: string): Promise<Event> {
-    if (!this.isNumber(id)) {
-      throw new BadRequestException('Vui lòng nhập số');
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Vui lòng nhập một số hợp lệ');
     }
-    const parsedId = Number(id);
-    return this.eventService.getEventById(parsedId);
+    const eventId = parseInt(id, 10);
+    const event = await this.eventService.findOne(eventId);
+    if (!event) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+    return this.eventService.getEventById(eventId);
   }
 
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
@@ -124,8 +149,13 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'The updated event' })
   @ApiResponse({ status: 404, description: 'Event not found' })
   async updateEvent(@Param('id') id: string, @Body() requestBody: UpdateEventDto) {
-    if (!this.isNumber(id)) {
-      throw new BadRequestException('Vui lòng nhập số');
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Vui lòng nhập một số hợp lệ');
+    }
+    const eventId = parseInt(id, 10);
+    const event = await this.eventService.findOne(eventId);
+    if (!event) {
+      throw new NotFoundException('Người dùng không tồn tại');
     }
     return this.eventService.updateEvent(+id, requestBody);
   }
@@ -136,13 +166,19 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'The event has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Event not found' })
   async deleteEvent(@Param('id') id: string): Promise<Event> {
-    if (!this.isNumber(id)) {
-      throw new BadRequestException('Vui lòng nhập số');
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Vui lòng nhập một số hợp lệ');
+    }
+    const eventId = parseInt(id, 10);
+    const event = await this.eventService.findOne(eventId);
+    console.log("event=>"+event)
+    if (!event) {
+      throw new NotFoundException('Người dùng không tồn tại');
     }
     return this.eventService.deleteEvent(+id);
   }
 
-  //////////*USER*//////////
+
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
   @Get('getalluser')
   @ApiOperation({ summary: 'Get all users' })
@@ -157,9 +193,14 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'User details' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiBearerAuth()
-  findOneUser(@Param('id') id: string) {
-    if (!this.isNumber(id)) {
-      throw new BadRequestException('Vui lòng nhập số');
+  async findOneUser(@Param('id') id: string) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Vui lòng nhập một số hợp lệ');
+    }
+    const userId = parseInt(id, 10);
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
     }
     return this.userService.findOne(+id);
   }
@@ -170,9 +211,14 @@ export class AdminController {
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiBearerAuth()
-  updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    if (!this.isNumber(id)) {
-      throw new BadRequestException('Vui lòng nhập số');
+  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Vui lòng nhập một số hợp lệ');
+    }
+    const userId = parseInt(id, 10);
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
     }
     return this.userService.updateUser(+id, updateUserDto);
   }
@@ -183,13 +229,19 @@ export class AdminController {
   @ApiResponse({ status: 204, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiBearerAuth()
-  removeUser(@Param('id') id: string) {
-    if (!this.isNumber(id)) {
-      throw new BadRequestException('Vui lòng nhập số');
+  async removeUser(@Param('id') id: string) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Vui lòng nhập một số hợp lệ');
     }
-    return this.userService.deleteUser(+id);
+    const userId = parseInt(id, 10);
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+    return this.userService.deleteUser(userId);
   }
- 
+  
+
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
   @Get('dashboard')
   async getDashboard() {

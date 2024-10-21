@@ -12,17 +12,17 @@ export class AdminGuards implements CanActivate {
     }
   
     const request = context.switchToHttp().getRequest();
-    const admin = request.admin; // Đảm bảo rằng admin đã được thêm vào request
+    const admin = request.admin; 
   
     if (!admin) {
       console.error('Admin not found in request');
       return false;
     }
   
-    console.log('Admin:', admin); // Log admin object
-    console.log('Admin Roles:', admin.role); // Log admin roles
+    console.log('Admin:', admin); 
+    console.log('Admin Roles:', admin.role); 
   
-    // Kiểm tra nếu admin.roles là undefined hoặc không phải là mảng
+    
     if (!admin.role) {
       console.error('Admin roles is undefined or not an array');
       return false;
