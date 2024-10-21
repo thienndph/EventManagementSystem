@@ -9,9 +9,9 @@
 ```bash
 # Edit your .env file
 -DATABASE_URL= postgres://<username>:<password>@<url database>/<database>?schema=<schema>
--GOOGLE_CLIENT_ID=880114734755-o7jlvg854tinugv1f8tb2necju88v5pm.apps.googleusercontent.com
--GOOGLE_CLIENT_SECRET=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
--GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
+-GOOGLE_CLIENT_ID=
+-GOOGLE_CLIENT_SECRET=
+-GOOGLE_CALLBACK_URL=
 ```
 
 ```bash
