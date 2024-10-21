@@ -7,14 +7,7 @@
 ```
 
 ```bash
-# Edit your .env file
--DATABASE_URL= postgres://<username>:<password>@<url database>/<database>?schema=<schema>
--GOOGLE_CLIENT_ID=
--GOOGLE_CLIENT_SECRET=
--GOOGLE_CALLBACK_URL=
-```
 
-```bash
 # Run Prisma client
 $ npx prisma migrate dev --schema=./src/modules/prisma/postgres/schema.prisma
 $ npx prisma generate --schema=./src/modules/prisma/postgres/schema.prisma
