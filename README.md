@@ -7,7 +7,11 @@
 ```
 
 ```bash
+# Edit your .env file
+- Use env.develop to create .evn run project
+```
 
+```bash
 # Run Prisma client
 $ npx prisma migrate dev --schema=./src/modules/prisma/postgres/schema.prisma
 $ npx prisma generate --schema=./src/modules/prisma/postgres/schema.prisma
