@@ -52,7 +52,7 @@ If you need to add a new field to the database, modify tables, or update the sch
 2. **Generate Migration Script**:
    - Generate the migration script based on the updated schema and the actual database.
    ```bash
-   $ npm run migrate-dev
+   $ npm run migrate-dev --schema=./src/modules/prisma/schema.prisma
    ```
 
 3. **Sync Prisma Models**:

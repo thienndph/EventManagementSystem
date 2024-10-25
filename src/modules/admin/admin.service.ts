@@ -3,109 +3,161 @@ import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { CreateAdminDto } from './dtos/create-admin.dto';
 import { UpdateAdminDto } from './dtos/update-admin.dto';
 import * as bcrypt from 'bcrypt';
-import { Role } from '@prisma/client';
+import { Admin, Role } from '@prisma/client';
+import { EventService } from '../event/event.service';
+import { adminStatus } from 'src/enums/adminStatus';
 
 @Injectable()
 export class AdminService {
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventService: EventService,
+  ) { }
 
+  // Create Admin
   async create(createAdminDto: CreateAdminDto) {
     try {
+      const existingAdmin = await this.prisma.admin.findUnique({
+        where: { email: createAdminDto.email },
+      });
+
+      if (existingAdmin) {
+        throw new BadRequestException('Email đã có tài khoản');
+      }
+
       const hashedPassword = await bcrypt.hash(createAdminDto.password, 10);
-      return this.prisma.admin.create({
+      const admin = await this.prisma.admin.create({
         data: {
           ...createAdminDto,
-          password: hashedPassword, 
+          password: hashedPassword,
           role: createAdminDto.role || Role.ADMIN,
+          status: createAdminDto.status,
         },
       });
+
+      return { email: admin.email, name: admin.name };
     } catch (error) {
+      console.error('Error creating admin:', error);
       throw new InternalServerErrorException('Error creating admin');
     }
   }
 
-  async findAll() {
-    try {
-      const page=1;
-      const limit=10;
-      const skip = (page - 1) * limit;
-      const admins = await this.prisma.admin.findMany({
-        skip: skip,
-        take: limit,
-      });
+  // Find All Admins with Pagination
+  async findAll(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const parsedLimit = Number(limit);
+    if (isNaN(parsedLimit) || parsedLimit <= 0) {
+      throw new InternalServerErrorException('Invalid limit provided');
+    }
 
-      const total = await this.prisma.admin.count();
+    try {
+      const [admins, totalCount] = await this.prisma.$transaction([
+        this.prisma.admin.findMany({
+          skip,
+          take: parsedLimit,
+        }),
+        this.prisma.admin.count(),
+      ]);
 
       return {
-        data: admins,
-        total,
-        page,
-        limit,
+        admins,
+        totalCount,
+        totalPages: Math.ceil(totalCount / parsedLimit),
+        currentPage: page,
       };
     } catch (error) {
+      console.error('Error fetching admins:', error);
       throw new InternalServerErrorException('Error fetching admins');
     }
   }
 
+  // Find One Admin by ID
   async findOne(id: number) {
+    if (!id) {
+      throw new BadRequestException('ID is required');
+    }
+
     try {
-      if (id === undefined || id === null) {
-        throw new BadRequestException('ID is required');
-      }
-      console.log('id TEST->>', id);
       const admin = await this.prisma.admin.findUnique({
         where: { id },
       });
-  
+
       if (!admin) {
-        throw new NotFoundException(`User with ID ${id} not found`);
+        throw new NotFoundException(`Admin with ID ${id} not found`);
       }
-  
+
       return admin;
     } catch (error) {
+      console.error('Error fetching admin:', error);
       throw new InternalServerErrorException('Error fetching admin');
     }
   }
-  
+
+  // Update Admin
   async update(id: number, updateAdminDto: UpdateAdminDto) {
+    const admin = await this.findOne(id);
+
+    if (!admin) {
+      throw new NotFoundException('Admin không tồn tại');
+    }
+
+    const hashedPassword = updateAdminDto.password
+      ? await bcrypt.hash(updateAdminDto.password, 10)
+      : admin.password;
+
     try {
-      await this.findOne(id); 
       return this.prisma.admin.update({
         where: { id },
         data: {
           ...updateAdminDto,
-          role: updateAdminDto.role,
+          password: hashedPassword,
         },
       });
     } catch (error) {
+      console.error('Error updating admin:', error);
       throw new InternalServerErrorException('Error updating admin');
     }
   }
 
-  async remove(id: number) {
+  // Remove (Soft Delete) Admin by setting status
+  async remove(id: number): Promise<Admin> {
+    const admin = await this.findOne(id);
+
+    if (!admin) {
+      throw new NotFoundException('Admin không tồn tại');
+    }
+
     try {
-      await this.findOne(id); 
-      return this.prisma.admin.delete({
+      return this.prisma.admin.update({
         where: { id },
+        data: {
+          status: adminStatus.DELETE,  // or adminStatus.INACTIVE if needed
+        },
       });
     } catch (error) {
-      throw new InternalServerErrorException('Error deleting admin');
+      console.error('Error updating admin status:', error);
+      throw new InternalServerErrorException('Error updating admin status');
     }
   }
 
+  // Get Dashboard Overview
   async getDashboardOverview() {
     try {
       const totalUsers = await this.prisma.user.count();
       const totalEvents = await this.prisma.event.count();
-      // const totalRegistrations = await this.prisma.registration.count();
-  
+      const totalRegistrationsResponse = await this.eventService.getEventByStatusCount();
+      const totalRegistrationsCount = totalRegistrationsResponse.length;
+      const userRegisEvent = await this.prisma.eventUser.count();
+
       return {
-        "Số người dùng => ": totalUsers,
-        "Số event => ": totalEvents,
-        // totalRegistrations,
+        totalUsers,
+        totalEvents,
+        totalRegistrationsCount,
+        userRegisEvent,
       };
     } catch (error) {
+      console.error('Error fetching dashboard overview:', error);
       throw new InternalServerErrorException('Error fetching dashboard overview');
     }
   }

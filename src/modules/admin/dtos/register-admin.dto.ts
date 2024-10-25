@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { adminStatus } from 'src/enums/adminStatus';
 
 
-export class CreateAdminDto {
+export class RegisterAdminDto {
   @ApiProperty()
   @IsEmail({}, { message: 'Email is not valid' })
   @IsNotEmpty({ message: 'Email is required' })
@@ -26,10 +26,10 @@ export class CreateAdminDto {
   @IsEnum(Role, { message: 'Role must be ADMIN or SUPER_ADMIN' })
   role?: Role; 
 
-  @ApiProperty({ description: 'Trạng thái của người dùng', enum: adminStatus, default: adminStatus.ACTIVE })
-  @IsEnum(adminStatus, { message: 'Trạng thái không hợp lệ.ACTIVE hoặc DELETE' })
-  @IsOptional()
-  status?: adminStatus = adminStatus.ACTIVE;
+//   @ApiProperty({ description: 'Trạng thái của người dùng', enum: adminStatus, default: adminStatus.ACTIVE })
+//   @IsEnum(adminStatus, { message: 'Trạng thái không hợp lệ.ACTIVE hoặc DELETE' })
+//   @IsOptional()
+//   status?: adminStatus = adminStatus.ACTIVE;
 
   @ApiProperty()
   @IsOptional()

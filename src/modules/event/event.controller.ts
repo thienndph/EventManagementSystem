@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete,Req,UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete,Req,UseGuards, Query } from '@nestjs/common';
 import { EventService } from './event.service';
 import { Event } from '@prisma/client';
 import {ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -8,9 +8,10 @@ import { AuthGuard } from '@nestjs/passport';
 
  //@ApiTags('events') 
  @Controller('events')
-@ApiBearerAuth()
+ //@ApiBearerAuth()
 export class EventController {
   constructor(private readonly eventService: EventService) {}
+
 
 //  // @UseGuards(AuthGuard('jwt'))
 //   @Post()

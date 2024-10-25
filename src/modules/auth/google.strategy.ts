@@ -22,7 +22,7 @@ async validate(
   done: VerifyCallback,
 ): Promise<any> {
   // console.log('profile->>', profile);
-
+  console.log('3->>');
   const { name, emails, id } = profile;
   const user: {
     id: number;

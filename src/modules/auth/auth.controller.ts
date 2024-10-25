@@ -8,13 +8,17 @@ import { CreateUserDto } from 'src/modules/user/dtos/create-user.dto';
 import { UserService } from 'src/modules/user/user.service';
 import { LoginAdminDto } from './dtos/login-admin.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { AdminService } from '../admin/admin.service';
+import { CreateAdminDto } from '../admin/dtos/create-admin.dto';
+import { RegisterUserDto } from '../user/dtos/register-user.dto';
 
  @ApiTags('auth') 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
     private readonly jwtService: JwtService,
-    private readonly userService :UserService
+    private readonly userService :UserService,
+    private readonly adminService :AdminService
   ) {}
 
   @Get('google')
@@ -26,7 +30,7 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Request() req) {
-    
+    console.log("1")
     return this.authService.login(req.user); 
   }
 
@@ -39,12 +43,18 @@ export class AuthController {
   async adminLogin(@Body() loginDto: LoginAdminDto) {
     return this.authService.loginadmin(loginDto);
   }
-
+  
+  @Post('registerAdmin')
+  @ApiOperation({ summary: 'Admin created' })
+  @ApiResponse({ status: 201, description: 'Admin created successfully.' })
+  regesterasdmin(@Body() createAdminDto: RegisterUserDto) {
+    return this.adminService.create(createAdminDto);
+  }
   
   @Post('registerUser')
   @ApiOperation({ summary: 'register a new user' })
   @ApiResponse({ status: 201, description: 'User register successfully.' })
-  register(@Body() createUserDto: CreateUserDto) {
+  registerUser(@Body() createUserDto: RegisterUserDto) {
     return this.userService.createUser(createUserDto);
   }
 

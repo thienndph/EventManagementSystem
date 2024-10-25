@@ -8,7 +8,7 @@ enum UserStatus {
   BLOCKED = 'BLOCKED'
 }
 
-export class CreateUserDto {
+export class RegisterUserDto {
   @ApiProperty({ description: 'Email của người dùng', example: 'user@example.com' })
   @IsEmail({}, { message: 'Email không hợp lệ.' })
   @IsNotEmpty({ message: 'Email không được để trống.' })
@@ -19,10 +19,8 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Tên không được để trống.' })
   name: string;
 
-  @ApiProperty({ description: 'ID Google của người dùng' })
-  @IsString({ message: 'ID Google phải là chuỗi.' })
-  @IsNotEmpty({ message: 'ID Google không được để trống.' })
-  idGoogle: string;
+  
+  idGoogle: null;
 
   @ApiProperty({ description: 'Mật khẩu của người dùng (tuỳ chọn)', required: false })
   @IsOptional()
@@ -55,8 +53,8 @@ export class CreateUserDto {
   @IsString({ message: 'Số điện thoại phải là chuỗi.' })
   phoneNumber?: string;
 
-  @ApiProperty({ description: 'Trạng thái của người dùng', enum: UserStatus, default: UserStatus.ACTIVE })
-  @IsEnum(UserStatus, { message: 'Trạng thái không hợp lệ.' })
-  @IsOptional()
-  status?: UserStatus = UserStatus.ACTIVE;
+//   @ApiProperty({ description: 'Trạng thái của người dùng', enum: UserStatus, default: UserStatus.ACTIVE })
+//   @IsEnum(UserStatus, { message: 'Trạng thái không hợp lệ.' })
+//   @IsOptional()
+ // status?: UserStatus = UserStatus.ACTIVE;
 }

@@ -5,7 +5,7 @@ import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { LoginDto } from 'src/modules/user/dtos/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginAdminDto } from './dtos/login-admin.dto';
-
+import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -16,8 +16,9 @@ export class AuthService {
   ) {}
 
   async validateUser(user: any): Promise<User> {
+    console.log('4');
     const existingUser = await this.prisma.user.findUnique({ where: { email: user.email } });
-
+    const statuss =0
     if (!existingUser) {
       const newUser = await this.prisma.user.create({
         data: {
@@ -28,9 +29,7 @@ export class AuthService {
           dateOfBirth: null, 
           address: null,     
           phoneNumber: null,
-          idGoogle:user.idGoogle, 
-          status:user.status
-               
+          idGoogle:user.idGoogle,           
         },
       });
       return newUser;
@@ -39,12 +38,14 @@ export class AuthService {
     return existingUser;
   }
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id ,typeAuth:user.typeAuth ,status:user.status};
-  
-    const status0 =0
+   
+    if (user.status === 1 || user.status === 3) {
+      throw new UnauthorizedException('Your account is not allowed to log in');
+    }
+    const payload = { email: user.email, id: user.id ,typeAuth:user.typeAuth ,status:user.status};
     const type ='User'
     const token = this.jwtService.sign(payload);
-    payload.status=0;
+   // const status0 =0;
     // const refreshToken = this.jwtService.sign(payload, {
     //   secret: 'refresh_token_secret',
     //   expiresIn: '7d',
@@ -56,7 +57,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
         typeAuth:type,
-        status :payload.status
+        status :user.status
       },
       token: token,
     //  refreshToken:refreshToken, 
@@ -75,6 +76,9 @@ export class AuthService {
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+    if (user.status == UserStatus.INACTIVE || user.status == UserStatus.BLOCKED) {
+      throw new UnauthorizedException('Your account is not allowed to log in');
     }
     const type ='User'
     const token = this.jwtService.sign({

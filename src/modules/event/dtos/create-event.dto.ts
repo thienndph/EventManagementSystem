@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsInt, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsInt, IsDateString, IsEnum } from 'class-validator';
+
+enum EventStatus {
+  CONFRIM = 'CONFRIM',
+  NOCONFRIM = 'NOCONFRIM',
+  DELETE = 'DELETE',
+}
 
 export class CreateEventDto {
 
@@ -28,13 +34,13 @@ export class CreateEventDto {
   @IsInt()
   seats: number; 
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsInt()
-  userId: number; 
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // @IsInt()
+  // userId: number; 
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsInt()
-  status: number;
+  // @ApiProperty({ description: 'Trạng thái của người dùng', enum: EventStatus, default: EventStatus.NOCONFRIM })
+  // @IsEnum(EventStatus, { message: 'Trạng thái không hợp lệ.' })
+  // @IsOptional()
+  // status?: EventStatus = EventStatus.CONFRIM;
 }

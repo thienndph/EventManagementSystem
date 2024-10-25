@@ -10,7 +10,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientID: process.env.GOOGLE_CLIENT_ID, // Client ID từ Google
       clientSecret: process.env.GOOGLE_CLIENT_SECRET, // Client Secret từ Google
       callbackURL: process.env.GOOGLE_CALLBACK_URL, // URL callback sau khi xác thực thành công
-      scope: ['email', 'profile'], // Phạm vi dữ liệu yêu cầu từ Google
+      scope: ['email', 'profile'], 
     });
   }
 

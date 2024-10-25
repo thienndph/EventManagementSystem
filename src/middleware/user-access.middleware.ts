@@ -8,15 +8,18 @@ export class UserAccessMiddleware implements NestMiddleware {
 
   async use(req: any, res: any, next: () => void) {
     const jwtToken = get(req.headers['authorization']?.split(' '), 1, '');
+    console.log("jwtToken"+jwtToken)
     if (!jwtToken) {
       throw new UnauthorizedException('Missing JWT token');
     }
   
     try {
       const decoded = verify(jwtToken, process.env.ADMIN_SECRET_KEY);
-      const { sub, typeAuth } = decoded as any;
-      console.log('sub==>'+sub)
-      const user = await this.userService.findOne(+sub); 
+      console.log("decoded"+decoded)
+      const { id, typeAuth } = decoded as any;
+      console.log('typeAuth==>'+typeAuth)
+      console.log('sub==>'+id)
+      const user = await this.userService.findOne(+id); 
       if (!user) throw new UnauthorizedException('Admin not found');
       
       req.user = user;

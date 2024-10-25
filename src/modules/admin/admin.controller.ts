@@ -10,6 +10,11 @@ import { UpdateEventDto } from '../event/dtos/update-event.dto';
 import { AdminGuards } from './guards/admin.guard';
 import { UpdateUserDto } from '../user/dtos/update-user.dto';
 import { UserService } from '../user/user.service';
+import { CreateAdminLogDto } from '../adminlog/dto/create-admin-log.dto';
+import { AdminLogService } from '../adminlog/admin-log.service';
+import { UserStatus } from '@prisma/client';
+import { SearchEventDto } from '../event/dtos/event.dto';
+import { eventStatus } from 'src/enums/eventStatus';
 
 @ApiTags('admin')
 @ApiBearerAuth()
@@ -19,7 +24,8 @@ import { UserService } from '../user/user.service';
 export class AdminController {
   constructor(private readonly adminService: AdminService,
     private readonly eventService: EventService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly logAdminService: AdminLogService,
   ) { }
 
   //////////*ADMIN*//////////
@@ -36,8 +42,10 @@ export class AdminController {
   @Get('getAll')
   @ApiResponse({ status: 200, description: 'List of all admins.' })
   async findAll(
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 10
   ) {
-    return this.adminService.findAll();
+    return this.adminService.findAll(page, limit);
   }
 
 
@@ -58,7 +66,7 @@ export class AdminController {
   }
 
   @AdminGuard(['SUPER_ADMIN'])
-  @Patch(':id')
+  @Patch('admin/:id')
   @ApiResponse({ status: 200, description: 'Admin updated successfully.' })
   @ApiResponse({ status: 404, description: 'Admin not found.' })
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
@@ -89,16 +97,22 @@ export class AdminController {
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
   @Get('/event_no_accept')
   @ApiResponse({ status: 200, description: 'List event no accept.' })
-  findByStatus() {
+  async findByStatus(
+    @Query('page') page:string,  @Query('limit') limit :string
+  ) {
     const status = 0;
-    console.log('TEST')
-    return this.eventService.getEventByStatus(status);
+
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+  
+    return this.eventService.getEventByStatus(status, pageNumber, limitNumber);
   }
+  
 
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
   @Post('eventConfirm/:id')
   @ApiResponse({ status: 200, description: 'List event no accept.' })
-  confirmEvent(@Param('id') id: string): Promise<Event> {
+  async confirmEvent(@Param('id') id: string,@Req() req: any): Promise<Event> {
     console.log("Id=>"+id)
     const parsedId = Number(id);
     console.log("parsedId=>"+parsedId)
@@ -110,7 +124,18 @@ export class AdminController {
       throw new BadRequestException('Vui lòng nhập lại đúng');
       }
 
-    return this.eventService.updateStatus(id);
+    const event =this.eventService.updateStatus(id);
+
+    const adminId = req.admin.id;
+    const logData: CreateAdminLogDto = {
+      adminId: adminId,
+      action: 'UPDATE',
+      eventId: parsedId,
+    };
+
+    await this.logAdminService.create(logData);
+
+    return event;
   }
 
 
@@ -118,8 +143,11 @@ export class AdminController {
   @Get('eventAll')
   @ApiOperation({ summary: 'Get all events' })
   @ApiResponse({ status: 200, description: 'List of events' })
-  async getAllEvents() {
-    return this.eventService.getAllEvents();
+  async getAllEvents(
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 10, 
+  ) {
+    return this.eventService.getAllEvents(page, limit); 
   }
 
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
@@ -144,16 +172,29 @@ export class AdminController {
   @ApiOperation({ summary: 'Update an event' })
   @ApiResponse({ status: 200, description: 'The updated event' })
   @ApiResponse({ status: 404, description: 'Event not found' })
-  async updateEvent(@Param('id') id: string, @Body() requestBody: UpdateEventDto) {
+  async updateEvent(@Param('id') id: string, @Body() requestBody: UpdateEventDto,@Req() req) {
     if (isNaN(Number(id))) {
       throw new BadRequestException('Vui lòng nhập một số hợp lệ');
     }
     const eventId = parseInt(id, 10);
     const event = await this.eventService.findOne(eventId);
     if (!event) {
-      throw new NotFoundException('Người dùng không tồn tại');
+      throw new NotFoundException('Event dùng không tồn tại');
     }
-    return this.eventService.updateEvent(+id, requestBody);
+    if(event.status==eventStatus.DELETE){
+      throw new NotFoundException('Event đã bị xoá');
+    }
+    const eventUpdate= this.eventService.updateEvent(+id, requestBody);
+
+    const adminId = req.admin.id;
+    const logData: CreateAdminLogDto = {
+      adminId: adminId,
+      action: 'UPDATE',
+      eventId: eventId,
+    };
+
+    await this.logAdminService.create(logData);
+    return eventUpdate;
   }
 
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
@@ -161,7 +202,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Delete an event' })
   @ApiResponse({ status: 200, description: 'The event has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Event not found' })
-  async deleteEvent(@Param('id') id: string): Promise<Event> {
+  async deleteEvent(@Param('id') id: string,@Req() req): Promise<Event> {
     if (isNaN(Number(id))) {
       throw new BadRequestException('Vui lòng nhập một số hợp lệ');
     }
@@ -169,9 +210,20 @@ export class AdminController {
     const event = await this.eventService.findOne(eventId);
     console.log("event=>"+event)
     if (!event) {
-      throw new NotFoundException('Người dùng không tồn tại');
+      throw new NotFoundException('Event không tồn tại');
     }
-    return this.eventService.deleteEvent(+id);
+    if(event.status==eventStatus.DELETE){
+      throw new NotFoundException('Event không còn tồn tại');
+    }
+    const eventDelete= this.eventService.delelte(+id);
+    const adminId = req.admin.id;
+    const logData: CreateAdminLogDto = {
+      adminId: adminId,
+      action: 'DELETE',
+      eventId: eventId,
+    };
+    await this.logAdminService.create(logData);
+    return eventDelete;
   }
 
 
@@ -179,8 +231,11 @@ export class AdminController {
   @Get('getalluser')
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of users' })
-  findAllUser() {
-    return this.userService.findAll();
+  async findAllUser(
+    @Query('page') page: number = 1, 
+    @Query('limit') limit: number = 10 
+  ) {
+    return this.userService.findAll(page, limit); 
   }
 
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
@@ -196,6 +251,9 @@ export class AdminController {
     const userId = parseInt(id, 10);
     const user = await this.userService.findOne(userId);
     if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+    if(user.status=UserStatus.INACTIVE){
       throw new NotFoundException('Người dùng không tồn tại');
     }
     return this.userService.findOne(+id);
@@ -216,7 +274,38 @@ export class AdminController {
     if (!user) {
       throw new NotFoundException('Người dùng không tồn tại');
     }
+    console.log('user.status =>'+user.status)
+    if(user.status==UserStatus.INACTIVE){
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+
     return this.userService.updateUser(+id, updateUserDto);
+  }
+
+  @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
+  @Patch('lockUser/:id')
+  @ApiOperation({ summary: 'Update a user' })
+  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiBearerAuth()
+  async lockUser(@Param('id') id: string) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Vui lòng nhập một số hợp lệ');
+    }
+    const userId = parseInt(id, 10);
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+    console.log('user.status =>'+user.status)
+    if(user.status==UserStatus.INACTIVE){
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+    if(user.status==UserStatus.BLOCKED){
+      throw new NotFoundException('Người dùng đã bị block');
+    }
+
+    return this.userService.lockUser(+id);
   }
 
   @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
@@ -234,6 +323,9 @@ export class AdminController {
     if (!user) {
       throw new NotFoundException('Người dùng không tồn tại');
     }
+    if(user.status==UserStatus.INACTIVE){
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
     return this.userService.deleteUser(userId);
   }
   
@@ -242,5 +334,13 @@ export class AdminController {
   @Get('dashboard')
   async getDashboard() {
     return this.adminService.getDashboardOverview();
+  }
+
+  @AdminGuard(['SUPER_ADMIN', 'ADMIN'])
+  @Get('findEventByTime')
+  @ApiOperation({ summary: 'Find event by time' })
+  @Get('search')
+  async searchEvents(@Query() query: SearchEventDto) {
+    return this.eventService.findEvents(query);
   }
 }

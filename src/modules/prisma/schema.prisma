@@ -12,12 +12,29 @@ enum Role {
   SUPER_ADMIN
 }
 
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+enum EventStatus {
+  NOCONFRIM
+  CONFRIM
+  DELETE
+}
+
+enum AdminStatus {
+  ACTIVE
+  DELETE
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   email       String   @unique
   name        String
-  status      Int? 
-  idGoogle    String   @unique
+  status      UserStatus @default(ACTIVE) 
+  idGoogle    String?
   password    String? 
   age         Int?     
   gender      String?  
@@ -34,37 +51,53 @@ model Admin {
   email       String    @unique
   password    String? 
   name        String? 
-role        Role? 
+  role        Role? 
   age         Int? 
-  status      Int?
+  status      AdminStatus @default(ACTIVE)
   gender      String? 
   dateOfBirth DateTime? 
   address     String? 
   phoneNumber String? 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  logs        AdminLog[] @relation("AdminLogs") 
 }
+
 
 model Event {
   id          Int         @id @default(autoincrement())
   title       String     
   description String?    
-  status      Int?
+  status      EventStatus?
   location    String      
   date        DateTime    
   seats       Int         
-  //user        User        @relation("UserEvents", fields: [userId], references: [id])
   userId      Int
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  eventUsers EventUser[]
+  eventUsers  EventUser[]
+  logs        AdminLog[]  @relation("EventLogs") 
 }
+
           
 model EventUser {
   idEvent Int
   idUser  Int
   event   Event @relation(fields: [idEvent], references: [id])
   user    User  @relation(fields: [idUser], references: [id])
-
   @@id([idEvent, idUser]) 
 }
+
+model AdminLog {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  action    String   
+  eventId   Int?    
+  createdAt DateTime @default(now())
+  admin     Admin    @relation("AdminLogs", fields: [adminId], references: [id]) 
+  event     Event?   @relation("EventLogs", fields: [eventId], references: [id]) 
+  @@index([adminId])
+  @@index([eventId])
+}
+
+
